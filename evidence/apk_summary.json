@@ -1,0 +1,45 @@
+{
+  "package": "com.UnityTechnologies.com.unity.template.urpblank",
+  "app_name": "YubiQuestApp-v0.1.0",
+  "version_name": "0.1.0",
+  "version_code": "1",
+  "min_sdk": "32",
+  "target_sdk": "32",
+  "main_activity": "com.unity3d.player.UnityPlayerGameActivity",
+  "activities": [
+    "com.unity3d.player.UnityPlayerGameActivity"
+  ],
+  "services": [],
+  "receivers": [],
+  "providers": [
+    "androidx.startup.InitializationProvider"
+  ],
+  "permissions": [
+    "android.permission.INTERNET",
+    "com.oculus.permission.HAND_TRACKING"
+  ],
+  "features": [
+    "android.hardware.vr.headtracking",
+    "android.hardware.vulkan.version",
+    "android.hardware.touchscreen",
+    "android.hardware.touchscreen.multitouch",
+    "android.hardware.touchscreen.multitouch.distinct",
+    "oculus.software.handtracking"
+  ],
+  "is_signed_v1": false,
+  "is_signed_v2": true,
+  "is_signed_v3": false,
+  "certificates": [
+    {
+      "source": "v2",
+      "subject": "C=US,O=Android,CN=Android Debug",
+      "issuer": "C=US,O=Android,CN=Android Debug",
+      "serial_number_hex": "0x1",
+      "not_valid_before": "2026-05-30T04:51:21+00:00",
+      "not_valid_after": "2056-05-22T04:51:21+00:00",
+      "sha1_fingerprint": "BA:EC:78:2E:B6:2E:E1:E5:A8:68:B5:85:30:5F:FD:F6:BB:8F:91:E3",
+      "sha256_fingerprint": "46:36:DF:3B:6D:94:2D:99:52:F5:43:62:38:81:10:CB:11:97:E9:88:88:4D:BE:E0:11:12:86:B7:2C:A3:17:E0",
+      "signature_algorithm": "sha256"
+    }
+  ]
+}
