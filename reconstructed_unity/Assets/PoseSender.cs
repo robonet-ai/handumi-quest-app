@@ -1,4 +1,4 @@
-// Reconstructed from YubiQuestApp-v0.1.0.apk.
+// Reconstructed from the reference APK.
 // NOT the original AIRoA source code.
 //
 // CONFIRMED: source path was Assets/PoseSender.cs; class/type names, fields,
@@ -149,7 +149,7 @@ public sealed class PoseSender : MonoBehaviour
         })
         {
             IsBackground = true,
-            Name = "YubiQuestApp Pose TCP accept"
+            Name = "HandUMIQuestApp Pose TCP accept"
         };
         listenThread.Start();
 

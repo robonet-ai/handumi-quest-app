@@ -1,4 +1,4 @@
-# Recovered YubiQuestApp wire protocol
+# HandUMI Quest App wire protocol
 
 ## Pose stream
 

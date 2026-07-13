@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="11" result="Passed" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:34Z" duration="0.4683786">
+  <test-suite type="TestSuite" id="1000" name="HandUMIQuestApp-v0.2.0" fullname="HandUMIQuestApp-v0.2.0" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:34Z" duration="0.468379" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1014" name="HandUMIQuestApp.EditModeTests.dll" fullname="/home/alvax/or/YubiQuestApp/Library/ScriptAssemblies/HandUMIQuestApp.EditModeTests.dll" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:34Z" duration="0.462047" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="474528" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1001" name="HandUMIWireProtocolTests" fullname="HandUMIWireProtocolTests" classname="HandUMIWireProtocolTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:34Z" duration="0.461137" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1012" name="AndroidIdentitySupportsSideBySideInstall" fullname="HandUMIWireProtocolTests.AndroidIdentitySupportsSideBySideInstall" methodname="AndroidIdentitySupportsSideBySideInstall" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1964837198" result="Passed" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:33Z" duration="0.014346" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1013" name="CompatibilitySceneIsEnabledAndWiresRecoveredServices" fullname="HandUMIWireProtocolTests.CompatibilitySceneIsEnabledAndWiresRecoveredServices" methodname="CompatibilitySceneIsEnabledAndWiresRecoveredServices" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="583946666" result="Passed" start-time="2026-07-13 18:30:33Z" end-time="2026-07-13 18:30:34Z" duration="0.272704" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1009" name="DefaultPortsMatchHandumiLegacyConfiguration" fullname="HandUMIWireProtocolTests.DefaultPortsMatchHandumiLegacyConfiguration" methodname="DefaultPortsMatchHandumiLegacyConfiguration" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="875952769" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000358" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1011" name="MetaFeaturesSupportHandsAndRuntimeControllerModels" fullname="HandUMIWireProtocolTests.MetaFeaturesSupportHandsAndRuntimeControllerModels" methodname="MetaFeaturesSupportHandsAndRuntimeControllerModels" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1815466309" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000424" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1002" name="PoseDataFieldsMatchRecoveredLegacyContract" fullname="HandUMIWireProtocolTests.PoseDataFieldsMatchRecoveredLegacyContract" methodname="PoseDataFieldsMatchRecoveredLegacyContract" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1167447686" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000654" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1003" name="PoseFrameIsUtf8JsonWithExactlyOneTrailingNewline" fullname="HandUMIWireProtocolTests.PoseFrameIsUtf8JsonWithExactlyOneTrailingNewline" methodname="PoseFrameIsUtf8JsonWithExactlyOneTrailingNewline" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="514891486" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.001224" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1010" name="StatusTextShowsTheAppVersionAndEndpointForConnectedClients" fullname="HandUMIWireProtocolTests.StatusTextShowsTheAppVersionAndEndpointForConnectedClients" methodname="StatusTextShowsTheAppVersionAndEndpointForConnectedClients" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1068953738" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000247" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1008" name="TimeSyncRejectsMalformedRequests" fullname="HandUMIWireProtocolTests.TimeSyncRejectsMalformedRequests" classname="HandUMIWireProtocolTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.157943" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1005" name="TimeSyncRejectsMalformedRequests(null)" fullname="HandUMIWireProtocolTests.TimeSyncRejectsMalformedRequests(null)" methodname="TimeSyncRejectsMalformedRequests" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1674455865" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000328" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1006" name="TimeSyncRejectsMalformedRequests(System.Byte[])" fullname="HandUMIWireProtocolTests.TimeSyncRejectsMalformedRequests(System.Byte[])" methodname="TimeSyncRejectsMalformedRequests" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1661451580" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000045" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1007" name="TimeSyncRejectsMalformedRequests(System.Byte[])" fullname="HandUMIWireProtocolTests.TimeSyncRejectsMalformedRequests(System.Byte[])" methodname="TimeSyncRejectsMalformedRequests" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="819416543" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.000033" asserts="0">
+            <properties>
+              <property name="childIndex" value="2" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1004" name="TimeSyncRequestAndResponseMatchLittleEndianLayout" fullname="HandUMIWireProtocolTests.TimeSyncRequestAndResponseMatchLittleEndianLayout" methodname="TimeSyncRequestAndResponseMatchLittleEndianLayout" classname="HandUMIWireProtocolTests" runstate="Runnable" seed="1714641143" result="Passed" start-time="2026-07-13 18:30:34Z" end-time="2026-07-13 18:30:34Z" duration="0.001155" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: /home/alvax/.config/unity3d/DefaultCompany/HandUMIQuestApp-v0.2.0/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -1,6 +1,6 @@
-# YubiQuestApp v0.1.0 — APK recovery bundle
+# HandUMI Quest App v0.2.0
 
-This bundle was produced by static analysis of `yubi-quest-app-v0.1.0.apk`.
+HandUMI Quest App is a reconstruction of YubiQuestApp based on its `.apk`.
 
 ## Important limitation
 
@@ -12,23 +12,23 @@ Confidence labels used in the source comments:
 - **STRONGLY INFERRED** — behavior visible in native code and/or exactly matched by the public ROS bridge.
 - **APPROXIMATE** — implementation chosen to reproduce observed behavior where original C# syntax was erased.
 
-Start with `YubiQuestApp_APK_Analysis.md` and `reconstructed_unity/README.md`.
+Start with `HandUMIQuestApp_APK_Analysis.md` and `reconstructed_unity/README.md`.
 
 ## Compatibility scene
 
 The checked-in scene at
-`Assets/YubiQuestApp/Scenes/YubiQuestCompatibility.unity` contains the minimal
+`Assets/HandUMIQuestApp/Scenes/HandUMIQuestCompatibility.unity` contains the minimal
 reconstructed runtime: `OVRManager`, `OVRCameraRig`, `PoseSender`,
 `TimeSyncServer`, `QuestRefresh120`, and `SafeTrackingOrigin`. Regenerate it
 repeatably from Unity with:
 
 ```text
-Tools > YubiQuest > Rebuild Compatibility Scene
+Tools > HandUMI Quest > Rebuild Compatibility Scene
 ```
 
 ## Automated tests
 
-The tests under `Assets/Tests/EditMode` protect the legacy HandUMI/YUBI wire
+The tests under `Assets/Tests/EditMode` protect the legacy HandUMI wire
 contract: JSON field names and framing, TCP/UDP ports, time-sync byte layout,
 the side-by-side Android package/version identity, and scene wiring. PlayMode tests
 exercise TCP reconnect, UDP request handling, and socket release on teardown.
@@ -71,11 +71,11 @@ Build from the command line:
 
 ```bash
 UNITY=/path/to/Unity
-YUBI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.1.0.apk" \
+HANDUMI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.2.0.apk" \
   "$UNITY" \
   -batchmode -nographics -buildTarget Android \
   -projectPath "$PWD" \
-  -executeMethod YubiCompatibilityBuild.BuildAndroid \
+  -executeMethod HandUMICompatibilityBuild.BuildAndroid \
   -logFile Builds/Android/build.log \
   -quit
 ```
@@ -83,10 +83,9 @@ YUBI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.1.0.apk" \
 The build writes the APK plus `.manifest.json` and `.sha256` evidence files.
 These outputs are intentionally gitignored.
 
-The reconstructed APK is labeled `HandUMIQuestApp-v0.1.0` and uses package ID
-`com.handumi.questapp`, so it can remain installed beside the released YUBI
-app. The two apps retain the same compatibility ports (TCP 65432 and UDP
-42000), so force-stop one before starting the other.
+The APK is labeled `HandUMIQuestApp-v0.2.0` and uses package ID
+`com.handumi.questapp`. It retains the compatibility ports (TCP 65432 and UDP
+42000); force-stop any other compatible app before starting it.
 
 ## Validation boundary
 
@@ -94,3 +93,13 @@ The reconstructed scene, automated tests, and local APK build do not establish
 behavioral parity on Quest hardware. Follow
 `docs/quest-hardware-validation.md` before treating this APK as a replacement
 for data collection.
+
+## References and Acknowledgments
+
+- UMI: Chi et al., "Universal Manipulation Interface: In-The-Wild Robot Teaching Without In-The-Wild Robots," RSS 2024. Project · Paper
+- YUBI: Ohkawa et al., "YUBI: Yielding Universal Bidigital Interface for Bimanual Dexterous Manipulation at Scale," 2026. Project · Paper · Software
+- Meta Quest support uses YubiQuestApp and adapts the yubi-sw protocol and coordinate conversion. PICO support uses XRoboToolkit.
+- Core software: LeRobot, PyRoki, Viser, Rerun, and MuJoCo.
+- Robot assets: Almond Axol and AgileX Piper ROS, both MIT.
+
+HandUMI is not affiliated with or endorsed by Meta, PICO, AgileX, AIRoA/YUBI, Almond, or Hugging Face. All trademarks belong to their respective owners.

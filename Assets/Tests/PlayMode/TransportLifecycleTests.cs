@@ -67,16 +67,16 @@ public sealed class TransportLifecycleTests
             Assert.Throws<SocketException>(() => client.Receive(ref endpoint));
 
             const long pcTimeNs = 123456789012345L;
-            byte[] request = new byte[YubiWireProtocol.TimeSyncRequestSize];
-            request[0] = YubiWireProtocol.TimeSyncRequestId;
+            byte[] request = new byte[HandUMIWireProtocol.TimeSyncRequestSize];
+            request[0] = HandUMIWireProtocol.TimeSyncRequestId;
             Buffer.BlockCopy(BitConverter.GetBytes(pcTimeNs), 0, request, 1, 8);
             client.Send(request, request.Length);
 
             byte[] response = client.Receive(ref endpoint);
             Assert.That(response, Has.Length.EqualTo(
-                YubiWireProtocol.TimeSyncResponseSize));
+                HandUMIWireProtocol.TimeSyncResponseSize));
             Assert.That(response[0], Is.EqualTo(
-                YubiWireProtocol.TimeSyncResponseId));
+                HandUMIWireProtocol.TimeSyncResponseId));
             Assert.That(BitConverter.ToInt64(response, 1), Is.EqualTo(pcTimeNs));
             // OVRPlugin's runtime clock is zero in a headless Editor. Device
             // hardware validation separately requires a positive timestamp.

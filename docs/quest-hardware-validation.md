@@ -37,7 +37,7 @@ adb shell getprop ro.build.version.incremental
 Confirm the reference file before installation:
 
 ```bash
-sha256sum yubi-quest-app-v0.1.0.apk
+sha256sum reference-quest-app-v0.1.0.apk
 # Expected:
 # 1af91c35e0476b629d85f87bed33667a37b08ecba934596f8420069ab7174
 ```
@@ -45,7 +45,7 @@ sha256sum yubi-quest-app-v0.1.0.apk
 Install and launch it:
 
 ```bash
-adb install -r yubi-quest-app-v0.1.0.apk
+adb install -r reference-quest-app-v0.1.0.apk
 adb shell monkey -p com.UnityTechnologies.com.unity.template.urpblank 1
 ```
 
@@ -65,19 +65,19 @@ disconnect/reconnect, and a brief Wi-Fi interruption.
 ## 3. Install HandUMIQuestApp side by side
 
 The reconstruction uses the distinct package ID `com.handumi.questapp`, so it
-can coexist with the original YubiQuestApp. Do not uninstall the original.
+can coexist with the reference app. Do not uninstall the reference app.
 Only one app may run at a time because the wire-compatible builds use the same
 ports. Force-stop the original before launching the HandUMI build:
 
 ```bash
-adb install -r Builds/Android/handumi-quest-app-v0.1.0.apk
+adb install -r Builds/Android/handumi-quest-app-v0.2.0.apk
 adb shell am force-stop com.UnityTechnologies.com.unity.template.urpblank
 adb shell am force-stop com.handumi.questapp
 adb shell monkey -p com.handumi.questapp 1
 ```
 
 Put on the headset (or keep its proximity sensor active), select
-`HandUMIQuestApp-v0.1.0` under App Library > Unknown Sources if necessary,
+`HandUMIQuestApp-v0.2.0` under App Library > Unknown Sources if necessary,
 accept first-run prompts, and leave the app in the foreground. Wake both
 controllers and keep them inside the headset's tracking view.
 
@@ -96,9 +96,10 @@ Also run a 30-minute mixed-motion/network/thermal session.
 For the HandUMI reconstruction, verify the frontend before starting the soak:
 
 1. Confirm the environment is opaque `#191919` and the centered title reads
-   `HandUMI Quest App` in `#AF0000`.
+   `HandUMI Quest App (v0.2.0)` in `#AF0000`.
 2. With no TCP probe connected, confirm that no IP/status line is visible.
-3. Start `standalone_probe.py`; confirm `Connected • IP: <QUEST_IP>` appears.
+3. Start `standalone_probe.py`; confirm
+   `Connected • IP: <QUEST_IP>:65432` appears.
    Stop the probe and confirm the IP line disappears after disconnect detection.
 4. With controllers active, translate and rotate both devices and exercise
    A/B/X/Y, menu, both index triggers, both grips, both thumbsticks, and

@@ -1,4 +1,4 @@
-// Reconstructed from YubiQuestApp-v0.1.0.apk.
+// Reconstructed from the reference APK.
 // NOT the original AIRoA source code.
 //
 // CONFIRMED: source path Assets/RequestFPS.cs; class QuestRefresh120; Awake;

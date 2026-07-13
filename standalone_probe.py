@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small independent client for the recovered YubiQuestApp v0.1.0 protocol."""
+"""Small independent client for the recovered HandUMI Quest App protocol."""
 
 from __future__ import annotations
 
