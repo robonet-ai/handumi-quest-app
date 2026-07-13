@@ -1,0 +1,43 @@
+# Unity-generated directories
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# IDE-generated files
+.idea/
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity/OS transient files
+*.tmp
+*.bak
+*.swp
+*.log
+.DS_Store
+
+# Android build outputs
+*.apk
+*.aab
+*.apks
+*.unitypackage
+
+# Keep the recovered reference APK in this repository.
+!yubi-quest-app-v0.1.0.apk
