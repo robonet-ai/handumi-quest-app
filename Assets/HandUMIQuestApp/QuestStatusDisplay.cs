@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public sealed class QuestStatusDisplay : MonoBehaviour
 {
-    public const string AppTitle = "HandUMI Quest App (v0.2.0)";
+    public const string AppTitle = "HandUMI Quest App (v0.2.1)";
     public const string BackgroundHtml = "#191919";
     public const string TextHtml = "#AF0000";
     public const float NearClipMeters = 0.05f;

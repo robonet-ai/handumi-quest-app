@@ -443,7 +443,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HandUMI Quest App (v0.2.0)
+  m_Text: HandUMI Quest App (v0.2.1)
 --- !u!222 &577409026
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-# HandUMI Quest App v0.2.0
+# HandUMI Quest App v0.2.1
 
 HandUMI Quest App is a reconstruction of YubiQuestApp based on its `.apk`.
 
@@ -71,7 +71,7 @@ Build from the command line:
 
 ```bash
 UNITY=/path/to/Unity
-HANDUMI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.2.0.apk" \
+HANDUMI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.2.1.apk" \
   "$UNITY" \
   -batchmode -nographics -buildTarget Android \
   -projectPath "$PWD" \
@@ -83,7 +83,7 @@ HANDUMI_APK_OUTPUT="$PWD/Builds/Android/handumi-quest-app-v0.2.0.apk" \
 The build writes the APK plus `.manifest.json` and `.sha256` evidence files.
 These outputs are intentionally gitignored.
 
-The APK is labeled `HandUMIQuestApp-v0.2.0` and uses package ID
+The APK is labeled `HandUMIQuestApp-v0.2.1` and uses package ID
 `com.handumi.questapp`. It retains the compatibility ports (TCP 65432 and UDP
 42000); force-stop any other compatible app before starting it.
 

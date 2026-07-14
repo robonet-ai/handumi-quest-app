@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -109,10 +110,10 @@ public sealed class HandUMIWireProtocolTests
     {
         Assert.That(
             QuestStatusDisplay.FormatStatus(false, "192.168.1.20", 65432),
-            Is.EqualTo("HandUMI Quest App (v0.2.0)"));
+            Is.EqualTo("HandUMI Quest App (v0.2.1)"));
         Assert.That(
             QuestStatusDisplay.FormatStatus(true, "192.168.1.20", 65432),
-            Is.EqualTo("HandUMI Quest App (v0.2.0)\nConnected • IP: 192.168.1.20:65432"));
+            Is.EqualTo("HandUMI Quest App (v0.2.1)\nConnected • IP: 192.168.1.20:65432"));
     }
 
     [Test]
@@ -132,9 +133,27 @@ public sealed class HandUMIWireProtocolTests
         Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
             Is.EqualTo("com.handumi.questapp"));
         Assert.That(PlayerSettings.productName,
-            Is.EqualTo("HandUMIQuestApp-v0.2.0"));
-        Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.2.0"));
-        Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(2));
+            Is.EqualTo("HandUMIQuestApp-v0.2.1"));
+        Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.2.1"));
+        Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(3));
+        Assert.That(PlayerSettings.Android.applicationEntry,
+            Is.EqualTo(AndroidApplicationEntry.Activity),
+            "GameActivity can deadlock during Quest pause/resume (Unity UUM-139694).");
+    }
+
+    [Test]
+    public void AndroidManifestUsesLifecycleSafeActivity()
+    {
+        string manifest = File.ReadAllText(
+            "Assets/Plugins/Android/AndroidManifest.xml");
+
+        Assert.That(manifest,
+            Does.Contain("com.unity3d.player.UnityPlayerActivity"));
+        Assert.That(manifest,
+            Does.Not.Contain("com.unity3d.player.UnityPlayerGameActivity"),
+            "The custom manifest must not override the lifecycle-safe Player setting.");
+        Assert.That(manifest, Does.Contain("@style/UnityThemeSelector"));
+        Assert.That(manifest, Does.Not.Contain("@style/BaseUnityGameActivityTheme"));
     }
 
     [Test]

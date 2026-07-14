@@ -70,14 +70,14 @@ Only one app may run at a time because the wire-compatible builds use the same
 ports. Force-stop the original before launching the HandUMI build:
 
 ```bash
-adb install -r Builds/Android/handumi-quest-app-v0.2.0.apk
+adb install -r Builds/Android/handumi-quest-app-v0.2.1.apk
 adb shell am force-stop com.UnityTechnologies.com.unity.template.urpblank
 adb shell am force-stop com.handumi.questapp
 adb shell monkey -p com.handumi.questapp 1
 ```
 
 Put on the headset (or keep its proximity sensor active), select
-`HandUMIQuestApp-v0.2.0` under App Library > Unknown Sources if necessary,
+`HandUMIQuestApp-v0.2.1` under App Library > Unknown Sources if necessary,
 accept first-run prompts, and leave the app in the foreground. Wake both
 controllers and keep them inside the headset's tracking view.
 
@@ -91,12 +91,27 @@ adb shell monkey -p com.UnityTechnologies.com.unity.template.urpblank 1
 Repeat the same capture and interaction sequence used for the released APK.
 Also run a 30-minute mixed-motion/network/thermal session.
 
+The HandUMI build intentionally uses `UnityPlayerActivity`, not
+`UnityPlayerGameActivity`. Unity issue UUM-139694 reports intermittent Quest
+freezes in GameActivity's native pause/resume callbacks. Confirm the lifecycle
+workaround in the built manifest before the sleep/wake soak:
+
+```bash
+"$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/apkanalyzer" manifest print \
+  Builds/Android/handumi-quest-app-v0.2.1.apk | \
+  grep 'android:name="com.unity3d.player.UnityPlayerActivity"'
+```
+
+Run at least ten sleep/wake cycles, including one sleep of five minutes or
+longer, both with the TCP probe connected and disconnected. The app must resume
+head tracking and controller input every time without being force-stopped.
+
 ### In-headset frontend validation
 
 For the HandUMI reconstruction, verify the frontend before starting the soak:
 
 1. Confirm the environment is opaque `#191919` and the centered title reads
-   `HandUMI Quest App (v0.2.0)` in `#AF0000`.
+   `HandUMI Quest App (v0.2.1)` in `#AF0000`.
 2. With no TCP probe connected, confirm that no IP/status line is visible.
 3. Start `standalone_probe.py`; confirm
    `Connected • IP: <QUEST_IP>:65432` appears.

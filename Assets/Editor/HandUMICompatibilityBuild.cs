@@ -20,7 +20,7 @@ public static class HandUMICompatibilityBuild
     public const string ScenePath =
         "Assets/HandUMIQuestApp/Scenes/HandUMIQuestCompatibility.unity";
     public const string DefaultApkPath =
-        "Builds/Android/handumi-quest-app-v0.2.0.apk";
+        "Builds/Android/handumi-quest-app-v0.2.1.apk";
 
     private const string HandPrefabPath =
         "Packages/com.meta.xr.sdk.core/Prefabs/OVRHandPrefab.prefab";
