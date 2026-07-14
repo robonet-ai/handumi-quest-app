@@ -27,6 +27,8 @@ public static class HandUMIBodyProbeBuild
 
     private const string BuildInfoPath =
         "Assets/Resources/HandUMIBodyProbeBuildInfo.json";
+    private const string GeneratedUiMaterialPath =
+        "Assets/HandUMIBodyProbe/Generated/BodyProbeStatusText.mat";
 
     [MenuItem("Tools/HandUMI Body Probe/Rebuild Diagnostic Scene")]
     public static void RebuildScene()
@@ -184,11 +186,36 @@ public static class HandUMIBodyProbeBuild
         textTransform.offsetMax = Vector2.zero;
         Text text = textObject.AddComponent<Text>();
         text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.material = GetOrCreateStatusTextMaterial();
         text.fontSize = 54;
         text.alignment = TextAnchor.MiddleCenter;
         text.color = BodyProbeStatusDisplay.TextColor;
         text.text = BodyProbeStatusDisplay.AppTitle;
+        text.raycastTarget = false;
         canvasObject.GetComponent<BodyProbeStatusDisplay>().Configure(sender, text);
+    }
+
+    private static Material GetOrCreateStatusTextMaterial()
+    {
+        Shader uiShader = Shader.Find("UI/Default");
+        if (uiShader == null)
+            throw new InvalidOperationException("Unity UI/Default shader is unavailable.");
+
+        EnsureFolder("Assets/HandUMIBodyProbe/Generated");
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(
+            GeneratedUiMaterialPath);
+        if (material == null)
+        {
+            material = new Material(uiShader) { name = "HandUMIBodyProbeStatusText" };
+            AssetDatabase.CreateAsset(material, GeneratedUiMaterialPath);
+        }
+        else if (material.shader != uiShader)
+        {
+            material.shader = uiShader;
+            EditorUtility.SetDirty(material);
+        }
+
+        return material;
     }
 
     private static void EnsureSceneIdentity()

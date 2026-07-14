@@ -167,6 +167,9 @@ public sealed class BodyProbeEditModeTests
         Assert.That(sender, Is.Not.Null);
         Assert.That(status, Is.Not.Null);
         Assert.That(status.Sender, Is.SameAs(sender));
+        Assert.That(status.StatusText, Is.Not.Null);
+        Assert.That(status.StatusText.material, Is.Not.Null);
+        Assert.That(status.StatusText.material.shader.name, Is.EqualTo("UI/Default"));
     }
 
     private static OVRPlugin.BodyState SyntheticState(int jointCount)
