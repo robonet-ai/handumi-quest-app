@@ -1,0 +1,202 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public sealed class BodyProbeEditModeTests
+{
+    [TestCase(BodyProbeWireProtocol.UpperBodyJointCount, "UpperBody")]
+    [TestCase(BodyProbeWireProtocol.FullBodyJointCount, "FullBody")]
+    public void SerializesEveryBodyJointWithoutChangingFlags(
+        int jointCount,
+        string expectedJointSet)
+    {
+        OVRPlugin.BodyState state = SyntheticState(jointCount);
+        var body = new BodyProbeBodyData();
+
+        BodyProbeWireProtocol.PopulateBody(
+            body,
+            state,
+            OVRPlugin.BodyJointSet.FullBody);
+
+        Assert.That(body.active, Is.True);
+        Assert.That(body.activeJointSet, Is.EqualTo(expectedJointSet));
+        Assert.That(body.jointCount, Is.EqualTo(jointCount));
+        Assert.That(body.joints, Has.Length.EqualTo(jointCount));
+        for (int i = 0; i < jointCount; ++i)
+        {
+            Assert.That(body.joints[i].index, Is.EqualTo(i));
+            Assert.That(body.joints[i].locationFlags, Is.EqualTo(i % 16));
+            Assert.That(body.joints[i].position.x, Is.EqualTo(i + 0.25f));
+            Assert.That(body.joints[i].orientation.w, Is.EqualTo(1f));
+        }
+
+        string json = JsonUtility.ToJson(body);
+        Assert.That(json, Does.Contain($"\"jointCount\":{jointCount}"));
+        Assert.That(json, Does.Contain("\"locationFlags\":0"));
+        Assert.That(json, Does.Contain("\"locationFlags\":15"));
+        Assert.That(json, Does.Contain(expectedJointSet == "FullBody"
+            ? "FullBody_RightFootBall"
+            : "Body_RightHandLittleTip"));
+    }
+
+    [Test]
+    public void InactiveBodyClearsOldJointsInsteadOfReusingPoses()
+    {
+        var body = new BodyProbeBodyData();
+        BodyProbeWireProtocol.PopulateBody(
+            body,
+            SyntheticState(BodyProbeWireProtocol.FullBodyJointCount),
+            OVRPlugin.BodyJointSet.FullBody);
+        Assert.That(body.joints, Has.Length.EqualTo(84));
+
+        BodyProbeWireProtocol.PopulateBody(
+            body,
+            null,
+            OVRPlugin.BodyJointSet.FullBody);
+
+        Assert.That(body.active, Is.False);
+        Assert.That(body.activeJointSet, Is.EqualTo("None"));
+        Assert.That(body.jointCount, Is.Zero);
+        Assert.That(body.joints, Is.Empty);
+        Assert.That(body.sourceTimeNs, Is.Zero);
+    }
+
+    [Test]
+    public void ExtendedPoseKeepsLegacyFieldsFlatAndAdditive()
+    {
+        var pose = new BodyProbePoseData
+        {
+            seq = 17,
+            hmdPosition = new Vector3(1f, 2f, 3f),
+            leftTracked = true,
+            ovrTimeNs = 123
+        };
+        BodyProbeWireProtocol.PopulateBody(
+            pose.body,
+            SyntheticState(BodyProbeWireProtocol.UpperBodyJointCount),
+            OVRPlugin.BodyJointSet.UpperBody);
+
+        string frame = Encoding.UTF8.GetString(BodyProbeWireProtocol.EncodePose(pose));
+        Assert.That(frame, Does.EndWith("\n"));
+        Assert.That(frame, Does.Contain("\"hmdPosition\":"));
+        Assert.That(frame, Does.Contain("\"leftTracked\":true"));
+        Assert.That(frame, Does.Contain("\"ovrTimeNs\":123"));
+        Assert.That(frame, Does.Contain("\"packetType\":\"body_pose\""));
+        Assert.That(frame, Does.Contain("\"seq\":17"));
+        Assert.That(frame, Does.Contain("\"body\":"));
+        Assert.That(frame.IndexOf("\"hmdPosition\":", StringComparison.Ordinal),
+            Is.LessThan(frame.IndexOf("\"body\":", StringComparison.Ordinal)));
+    }
+
+    [Test]
+    public void SessionManifestIsASeparateFirstClassRecord()
+    {
+        var manifest = new BodyProbeSessionManifest
+        {
+            sessionId = "test-session",
+            firstPoseSeq = 0,
+            sourceCommit = "abc123",
+            requestedJointSet = "FullBody",
+            requestedFidelity = "High"
+        };
+        string frame = Encoding.UTF8.GetString(
+            BodyProbeWireProtocol.EncodeManifest(manifest));
+
+        Assert.That(frame, Does.EndWith("\n"));
+        Assert.That(frame, Does.Contain("\"packetType\":\"session_manifest\""));
+        Assert.That(frame, Does.Contain("\"schema\":\"handumi_quest_body_probe_manifest_v1\""));
+        Assert.That(frame, Does.Contain("\"firstPoseSeq\":0"));
+        Assert.That(frame, Does.Not.Contain("\"hmdPosition\":"));
+    }
+
+    [Test]
+    public void BodyProbeProfileHasIsolatedIdentityAndMetaSettings()
+    {
+        Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
+            Is.EqualTo("com.handumi.questapp.bodyprobe"));
+        Assert.That(PlayerSettings.productName,
+            Is.EqualTo("HandUMI Body Probe"));
+        Assert.That(OVRProjectConfig.CachedProjectConfig.bodyTrackingSupport,
+            Is.EqualTo(OVRProjectConfig.FeatureSupport.Supported));
+        Assert.That(OVRProjectConfig.CachedProjectConfig.handTrackingSupport,
+            Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersOnly));
+        Assert.That(OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet,
+            Is.EqualTo(OVRPlugin.BodyJointSet.FullBody));
+        Assert.That(OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingFidelity,
+            Is.EqualTo(OVRPlugin.BodyTrackingFidelity2.High));
+
+        string manifest = File.ReadAllText("Assets/Plugins/Android/AndroidManifest.xml");
+        Assert.That(manifest, Does.Contain(BodyProbePermissionController.PermissionId));
+        Assert.That(manifest, Does.Contain("com.oculus.software.body_tracking"));
+    }
+
+    [Test]
+    public void DiagnosticSceneIsSeparateAndUsesFullBodyStageTracking()
+    {
+        Assert.That(EditorBuildSettings.scenes, Has.Length.EqualTo(1));
+        Assert.That(EditorBuildSettings.scenes[0].path,
+            Is.EqualTo("Assets/HandUMIBodyProbe/Scenes/HandUMIBodyProbe.unity"));
+        Scene scene = EditorSceneManager.OpenScene(
+            "Assets/HandUMIBodyProbe/Scenes/HandUMIBodyProbe.unity",
+            OpenSceneMode.Single);
+        GameObject[] roots = scene.GetRootGameObjects();
+        OVRManager manager = roots.Select(root => root.GetComponent<OVRManager>())
+            .FirstOrDefault(value => value != null);
+        OVRBody body = roots.SelectMany(root => root.GetComponentsInChildren<OVRBody>(true))
+            .FirstOrDefault();
+        BodyProbeSender sender = roots
+            .SelectMany(root => root.GetComponentsInChildren<BodyProbeSender>(true))
+            .FirstOrDefault();
+        BodyProbeStatusDisplay status = roots
+            .SelectMany(root => root.GetComponentsInChildren<BodyProbeStatusDisplay>(true))
+            .FirstOrDefault();
+
+        Assert.That(manager, Is.Not.Null);
+        Assert.That(manager.trackingOriginType, Is.EqualTo(OVRManager.TrackingOrigin.Stage));
+        Assert.That(manager.SimultaneousHandsAndControllersEnabled, Is.False);
+        Assert.That(manager.launchSimultaneousHandsControllersOnStartup, Is.False);
+        Assert.That(body, Is.Not.Null);
+        Assert.That(body.ProvidedSkeletonType, Is.EqualTo(OVRPlugin.BodyJointSet.FullBody));
+        Assert.That(sender, Is.Not.Null);
+        Assert.That(status, Is.Not.Null);
+        Assert.That(status.Sender, Is.SameAs(sender));
+    }
+
+    private static OVRPlugin.BodyState SyntheticState(int jointCount)
+    {
+        var joints = new OVRPlugin.BodyJointLocation[jointCount];
+        for (int i = 0; i < joints.Length; ++i)
+        {
+            joints[i] = new OVRPlugin.BodyJointLocation
+            {
+                LocationFlags = (OVRPlugin.SpaceLocationFlags)(ulong)(i % 16),
+                Pose = new OVRPlugin.Posef
+                {
+                    Position = new OVRPlugin.Vector3f
+                    {
+                        x = i + 0.25f,
+                        y = i + 0.5f,
+                        z = i + 0.75f
+                    },
+                    Orientation = OVRPlugin.Quatf.identity
+                }
+            };
+        }
+        return new OVRPlugin.BodyState
+        {
+            JointLocations = joints,
+            Confidence = 0.75f,
+            SkeletonChangedCount = 9,
+            Time = 123.456789,
+            CalibrationStatus = OVRPlugin.BodyTrackingCalibrationState.Valid,
+            Fidelity = OVRPlugin.BodyTrackingFidelity2.High
+        };
+    }
+}

@@ -15,7 +15,7 @@ using TMPro;
 using UnityEngine;
 
 [Serializable]
-public sealed class PoseData
+public class PoseData
 {
     public Vector3 hmdPosition;
     public Quaternion hmdRotation;

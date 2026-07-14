@@ -121,6 +121,14 @@ public sealed class HandUMIWireProtocolTests
     {
         OVRProjectConfig config = OVRProjectConfig.CachedProjectConfig;
         Assert.That(config, Is.Not.Null);
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(config.handTrackingSupport,
+                Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersOnly));
+            Assert.That(config.bodyTrackingSupport,
+                Is.EqualTo(OVRProjectConfig.FeatureSupport.Supported));
+            return;
+        }
         Assert.That(config.handTrackingSupport,
             Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersAndHands));
         Assert.That(config.renderModelSupport,
@@ -130,6 +138,17 @@ public sealed class HandUMIWireProtocolTests
     [Test]
     public void AndroidIdentitySupportsSideBySideInstall()
     {
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
+                Is.EqualTo("com.handumi.questapp.bodyprobe"));
+            Assert.That(PlayerSettings.productName, Is.EqualTo("HandUMI Body Probe"));
+            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.1.0"));
+            Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(1));
+            Assert.That(PlayerSettings.Android.applicationEntry,
+                Is.EqualTo(AndroidApplicationEntry.Activity));
+            return;
+        }
         Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
             Is.EqualTo("com.handumi.questapp"));
         Assert.That(PlayerSettings.productName,
@@ -161,6 +180,12 @@ public sealed class HandUMIWireProtocolTests
     {
         const string scenePath =
             "Assets/HandUMIQuestApp/Scenes/HandUMIQuestCompatibility.unity";
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(File.Exists(scenePath), Is.True,
+                "The isolated body branch must retain the rollback scene source.");
+            return;
+        }
         EditorBuildSettingsScene[] buildScenes = EditorBuildSettings.scenes;
         Assert.That(buildScenes, Has.Length.EqualTo(1));
         Assert.That(buildScenes[0].enabled, Is.True);

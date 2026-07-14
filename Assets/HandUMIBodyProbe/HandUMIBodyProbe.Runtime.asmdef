@@ -1,0 +1,19 @@
+{
+  "name": "HandUMIBodyProbe.Runtime",
+  "rootNamespace": "",
+  "references": [
+    "HandUMIQuestApp.Runtime",
+    "Oculus.VR",
+    "Unity.XR.OpenXR",
+    "Unity.ugui"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

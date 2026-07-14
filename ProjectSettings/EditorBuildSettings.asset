@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/HandUMIQuestApp/Scenes/HandUMIQuestCompatibility.unity
-    guid: 023e34b198bf1348885bb5dc40285da7
+    path: Assets/HandUMIBodyProbe/Scenes/HandUMIBodyProbe.unity
+    guid: eef23f1a3c92e4304bded9f90c4ded6b
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 5935be43189291709b056e400e87f05e, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: ede01f3b4d4599180875f90d0c865677, type: 2}

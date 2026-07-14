@@ -3,12 +3,72 @@ using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.IO;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public sealed class TransportLifecycleTests
 {
+    [UnityTest]
+    public IEnumerator BodyProbeSendsManifestBeforeMonotonicPosesAcrossReconnect()
+    {
+        int port = FreeTcpPort();
+        GameObject owner = new GameObject("BodyProbeSender test owner");
+        BodyProbeSender sender = owner.AddComponent<BodyProbeSender>();
+        SetPrivateField(sender, "serverPort", port);
+        yield return null;
+
+        long firstSequence;
+        using (var first = new TcpClient())
+        {
+            first.Connect(IPAddress.Loopback, port);
+            yield return WaitForClientCount(sender, 1);
+            yield return WaitForNetworkData(first);
+            using (var reader = new StreamReader(
+                       first.GetStream(),
+                       System.Text.Encoding.UTF8,
+                       false,
+                       4096,
+                       true))
+            {
+                string manifest = reader.ReadLine();
+                string pose = reader.ReadLine();
+                Assert.That(manifest, Does.Contain(
+                    "\"packetType\":\"session_manifest\""));
+                Assert.That(pose, Does.Contain("\"packetType\":\"body_pose\""));
+                firstSequence = ParseSequence(pose);
+            }
+        }
+
+        yield return WaitForClientCount(sender, 0);
+        using (var second = new TcpClient())
+        {
+            second.Connect(IPAddress.Loopback, port);
+            yield return WaitForClientCount(sender, 1);
+            yield return WaitForNetworkData(second);
+            using (var reader = new StreamReader(
+                       second.GetStream(),
+                       System.Text.Encoding.UTF8,
+                       false,
+                       4096,
+                       true))
+            {
+                string manifest = reader.ReadLine();
+                string pose = reader.ReadLine();
+                Assert.That(manifest, Does.Contain(
+                    "\"packetType\":\"session_manifest\""));
+                Assert.That(ParseSequence(pose), Is.GreaterThan(firstSequence));
+            }
+        }
+
+        UnityEngine.Object.Destroy(owner);
+        yield return null;
+        var replacement = new TcpListener(IPAddress.Loopback, port);
+        Assert.DoesNotThrow(replacement.Start);
+        replacement.Stop();
+    }
+
     [UnityTest]
     public IEnumerator PoseServerAcceptsReconnectAndReleasesPortOnDestroy()
     {
@@ -112,6 +172,35 @@ public sealed class TransportLifecycleTests
             yield return null;
 
         Assert.That(sender.ConnectedClientCount, Is.EqualTo(expected));
+    }
+
+    private static IEnumerator WaitForClientCount(BodyProbeSender sender, int expected)
+    {
+        float deadline = Time.realtimeSinceStartup + 2f;
+        while (sender.ConnectedClientCount != expected &&
+               Time.realtimeSinceStartup < deadline)
+            yield return null;
+        Assert.That(sender.ConnectedClientCount, Is.EqualTo(expected));
+    }
+
+    private static IEnumerator WaitForNetworkData(TcpClient client)
+    {
+        float deadline = Time.realtimeSinceStartup + 2f;
+        while (client.Available == 0 && Time.realtimeSinceStartup < deadline)
+            yield return null;
+        Assert.That(client.Available, Is.GreaterThan(0));
+    }
+
+    private static long ParseSequence(string json)
+    {
+        const string marker = "\"seq\":";
+        int start = json.IndexOf(marker, StringComparison.Ordinal);
+        Assert.That(start, Is.GreaterThanOrEqualTo(0));
+        start += marker.Length;
+        int end = start;
+        while (end < json.Length && (json[end] == '-' || char.IsDigit(json[end])))
+            ++end;
+        return long.Parse(json.Substring(start, end - start));
     }
 
     private static int FreeTcpPort()
