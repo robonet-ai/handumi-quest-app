@@ -37,6 +37,11 @@ public sealed class BodyProbeSender : MonoBehaviour
     private BodyProbeBuildInfoAsset buildInfo = new BodyProbeBuildInfoAsset();
     private long nextSequence;
     private long lastSequence = -1;
+    private long nextBodyObservationSequence;
+    private long lastBodySourceTimeNs = long.MinValue;
+    private long lastSkeletonRevision = long.MinValue;
+    private bool lastBodyActive;
+    private bool hasBodyObservation;
 
     public string LocalIpAddress => localIpAddress;
     public int ServerPort => serverPort;
@@ -100,6 +105,19 @@ public sealed class BodyProbeSender : MonoBehaviour
             ? body.BodyState
             : null;
         BodyProbeWireProtocol.PopulateBody(packet.body, state, requestedJointSet);
+        bool isNewBodyObservation = !hasBodyObservation ||
+                                    packet.body.active != lastBodyActive ||
+                                    packet.body.sourceTimeNs != lastBodySourceTimeNs ||
+                                    packet.body.skeletonRevision != lastSkeletonRevision;
+        packet.body.isNewObservation = isNewBodyObservation;
+        if (isNewBodyObservation)
+        {
+            packet.body.observationSeq = nextBodyObservationSequence++;
+            lastBodyActive = packet.body.active;
+            lastBodySourceTimeNs = packet.body.sourceTimeNs;
+            lastSkeletonRevision = packet.body.skeletonRevision;
+            hasBodyObservation = true;
+        }
         packet.packetType = BodyProbeWireProtocol.PosePacketType;
         packet.seq = nextSequence++;
         lastSequence = packet.seq;

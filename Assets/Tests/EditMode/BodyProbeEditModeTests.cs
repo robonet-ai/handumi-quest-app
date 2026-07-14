@@ -29,6 +29,9 @@ public sealed class BodyProbeEditModeTests
         Assert.That(body.activeJointSet, Is.EqualTo(expectedJointSet));
         Assert.That(body.jointCount, Is.EqualTo(jointCount));
         Assert.That(body.joints, Has.Length.EqualTo(jointCount));
+        Assert.That(body.jointNames, Has.Length.EqualTo(jointCount));
+        Assert.That(body.jointLocationFlags, Has.Length.EqualTo(jointCount));
+        Assert.That(body.jointPoses, Has.Length.EqualTo(jointCount * 7));
         for (int i = 0; i < jointCount; ++i)
         {
             Assert.That(body.joints[i].index, Is.EqualTo(i));
@@ -39,8 +42,8 @@ public sealed class BodyProbeEditModeTests
 
         string json = JsonUtility.ToJson(body);
         Assert.That(json, Does.Contain($"\"jointCount\":{jointCount}"));
-        Assert.That(json, Does.Contain("\"locationFlags\":0"));
-        Assert.That(json, Does.Contain("\"locationFlags\":15"));
+        Assert.That(json, Does.Contain("\"jointLocationFlags\":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"));
+        Assert.That(json, Does.Not.Contain("\"joints\":"));
         Assert.That(json, Does.Contain(expectedJointSet == "FullBody"
             ? "FullBody_RightFootBall"
             : "Body_RightHandLittleTip"));
@@ -65,6 +68,9 @@ public sealed class BodyProbeEditModeTests
         Assert.That(body.activeJointSet, Is.EqualTo("None"));
         Assert.That(body.jointCount, Is.Zero);
         Assert.That(body.joints, Is.Empty);
+        Assert.That(body.jointNames, Is.Empty);
+        Assert.That(body.jointLocationFlags, Is.Empty);
+        Assert.That(body.jointPoses, Is.Empty);
         Assert.That(body.sourceTimeNs, Is.Zero);
     }
 
@@ -89,8 +95,14 @@ public sealed class BodyProbeEditModeTests
         Assert.That(frame, Does.Contain("\"leftTracked\":true"));
         Assert.That(frame, Does.Contain("\"ovrTimeNs\":123"));
         Assert.That(frame, Does.Contain("\"packetType\":\"body_pose\""));
+        Assert.That(frame, Does.Contain("\"schema\":\"tracking_packet_v2\""));
+        Assert.That(frame, Does.Contain("\"sourceSchemaVersion\":2"));
+        Assert.That(frame, Does.Contain("\"timestampQuality\":\"DIAGNOSTIC_ONLY\""));
         Assert.That(frame, Does.Contain("\"seq\":17"));
         Assert.That(frame, Does.Contain("\"body\":"));
+        Assert.That(frame, Does.Contain("\"jointLocationFlags\":"));
+        Assert.That(frame, Does.Contain("\"jointPoses\":"));
+        Assert.That(frame, Does.Not.Contain("\"joints\":"));
         Assert.That(frame.IndexOf("\"hmdPosition\":", StringComparison.Ordinal),
             Is.LessThan(frame.IndexOf("\"body\":", StringComparison.Ordinal)));
     }

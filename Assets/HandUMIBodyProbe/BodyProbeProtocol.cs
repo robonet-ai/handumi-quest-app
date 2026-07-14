@@ -46,7 +46,35 @@ public sealed class BodyProbeBodyData
     public long sourceTimeNs;
     public string sourceTimeDomain;
     public string poseClassification;
+    public string timestampQuality = BodyProbeWireProtocol.DiagnosticTimestampQuality;
+    public long observationSeq;
+    public bool isNewObservation;
+    public string[] jointNames = Array.Empty<string>();
+    public long[] jointLocationFlags = Array.Empty<long>();
+    public float[] jointPoses = Array.Empty<float>();
+    [NonSerialized]
     public BodyProbeJoint[] joints = Array.Empty<BodyProbeJoint>();
+}
+
+[Serializable]
+public sealed class BodyProbeHandData
+{
+    public string side;
+    public bool active;
+    public int jointCount;
+    public float[] jointPoses = Array.Empty<float>();
+    public long[] jointLocationFlags = Array.Empty<long>();
+}
+
+[Serializable]
+public sealed class BodyProbeExternalTrackerData
+{
+    public string id;
+    public bool tracked;
+    public bool valid;
+    public float[] pose = Array.Empty<float>();
+    public float[] velocity = Array.Empty<float>();
+    public float[] acceleration = Array.Empty<float>();
 }
 
 /// <summary>
@@ -57,8 +85,17 @@ public sealed class BodyProbeBodyData
 public sealed class BodyProbePoseData : PoseData
 {
     public string packetType = BodyProbeWireProtocol.PosePacketType;
+    public string schema = BodyProbeWireProtocol.TrackingPacketSchema;
+    public int sourceSchemaVersion = BodyProbeWireProtocol.TrackingPacketVersion;
+    public string source = "meta_quest";
+    public string sourceCoordinateSpace = "OpenXR Stage (floor), Unity left-handed meters";
+    public string sourceTimeDomain = "OVRPlugin.GetTimeInSeconds.seconds";
+    public string timestampQuality = BodyProbeWireProtocol.DiagnosticTimestampQuality;
     public long seq;
     public BodyProbeBodyData body = new BodyProbeBodyData();
+    public BodyProbeHandData[] hands = Array.Empty<BodyProbeHandData>();
+    public BodyProbeExternalTrackerData[] externalTrackers =
+        Array.Empty<BodyProbeExternalTrackerData>();
 }
 
 [Serializable]
@@ -122,6 +159,9 @@ public static class BodyProbeWireProtocol
     public const string ManifestPacketType = "session_manifest";
     public const string PosePacketType = "body_pose";
     public const string ManifestSchema = "handumi_quest_body_probe_manifest_v1";
+    public const string TrackingPacketSchema = "tracking_packet_v2";
+    public const int TrackingPacketVersion = 2;
+    public const string DiagnosticTimestampQuality = "DIAGNOSTIC_ONLY";
     public const string PoseClassification = "PLATFORM_ESTIMATED";
     public const string BodySourceTimeDomain = "OVRPlugin.BodyState.Time.seconds";
     public const int UpperBodyJointCount = 70;
@@ -171,6 +211,9 @@ public static class BodyProbeWireProtocol
             target.skeletonRevision = 0;
             target.sourceTimeSeconds = 0d;
             target.sourceTimeNs = 0;
+            target.jointNames = Array.Empty<string>();
+            target.jointLocationFlags = Array.Empty<long>();
+            target.jointPoses = Array.Empty<float>();
             target.joints = Array.Empty<BodyProbeJoint>();
             return;
         }
@@ -189,6 +232,13 @@ public static class BodyProbeWireProtocol
 
         if (target.joints == null || target.joints.Length != jointCount)
             target.joints = CreateJointArray(jointCount);
+        if (target.jointNames == null || target.jointNames.Length != jointCount)
+            target.jointNames = new string[jointCount];
+        if (target.jointLocationFlags == null ||
+            target.jointLocationFlags.Length != jointCount)
+            target.jointLocationFlags = new long[jointCount];
+        if (target.jointPoses == null || target.jointPoses.Length != jointCount * 7)
+            target.jointPoses = new float[jointCount * 7];
 
         string[] names = jointCount == FullBodyJointCount
             ? FullBodyNames
@@ -210,6 +260,16 @@ public static class BodyProbeWireProtocol
             destination.orientation.y = source.Pose.Orientation.y;
             destination.orientation.z = source.Pose.Orientation.z;
             destination.orientation.w = source.Pose.Orientation.w;
+            target.jointNames[i] = destination.name;
+            target.jointLocationFlags[i] = destination.locationFlags;
+            int poseOffset = i * 7;
+            target.jointPoses[poseOffset] = destination.position.x;
+            target.jointPoses[poseOffset + 1] = destination.position.y;
+            target.jointPoses[poseOffset + 2] = destination.position.z;
+            target.jointPoses[poseOffset + 3] = destination.orientation.x;
+            target.jointPoses[poseOffset + 4] = destination.orientation.y;
+            target.jointPoses[poseOffset + 5] = destination.orientation.z;
+            target.jointPoses[poseOffset + 6] = destination.orientation.w;
         }
     }
 
