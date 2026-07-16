@@ -54,11 +54,21 @@ adb shell am force-stop com.handumi.questapp.bodyprobe
 adb shell monkey -p com.handumi.questapp.bodyprobe 1
 ```
 
-Put on and unlock the Quest, grant body tracking permission, and keep the app
-foregrounded. The status panel must explicitly show permission, body active or
-inactive, requested/active joint set, joint count, calibration, fidelity,
-sender sequence, endpoint, and connection state. An inactive or unsupported
-result is evidence; do not substitute old joint poses.
+`com.oculus.permission.BODY_TRACKING` is a Meta install permission, not a
+changeable Android runtime permission. Do not run `adb shell pm grant` for it;
+that command correctly fails with `not a changeable permission type`. Verify
+the installed grant when diagnosing a package instead:
+
+```bash
+adb shell dumpsys package com.handumi.questapp.bodyprobe | \
+  grep -A4 "install permissions"
+```
+
+Put on and unlock the Quest and keep the app foregrounded. Handle any prompt
+shown by the Quest UI itself. The status panel must explicitly show permission,
+body active or inactive, requested/active joint set, joint count, calibration,
+fidelity, sender sequence, endpoint, and connection state. An inactive or
+unsupported result is evidence; do not substitute old joint poses.
 
 On the workstation:
 
