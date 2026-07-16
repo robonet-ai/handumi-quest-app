@@ -143,8 +143,8 @@ public sealed class HandUMIWireProtocolTests
             Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
                 Is.EqualTo("com.handumi.questapp.bodyprobe"));
             Assert.That(PlayerSettings.productName, Is.EqualTo("HandUMI Body Probe"));
-            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.1.1"));
-            Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(2));
+            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.1.2"));
+            Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(3));
             Assert.That(PlayerSettings.Android.applicationEntry,
                 Is.EqualTo(AndroidApplicationEntry.Activity));
             return;

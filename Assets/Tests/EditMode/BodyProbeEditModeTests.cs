@@ -37,6 +37,7 @@ public sealed class BodyProbeEditModeTests
             Assert.That(body.joints[i].index, Is.EqualTo(i));
             Assert.That(body.joints[i].locationFlags, Is.EqualTo(i % 16));
             Assert.That(body.joints[i].position.x, Is.EqualTo(i + 0.25f));
+            Assert.That(body.joints[i].position.z, Is.EqualTo(-(i + 0.75f)));
             Assert.That(body.joints[i].orientation.w, Is.EqualTo(1f));
         }
 
@@ -47,6 +48,33 @@ public sealed class BodyProbeEditModeTests
         Assert.That(json, Does.Contain(expectedJointSet == "FullBody"
             ? "FullBody_RightFootBall"
             : "Body_RightHandLittleTip"));
+    }
+
+    [Test]
+    public void ConvertsNativeBodyPoseToControllerUnityTrackingSpace()
+    {
+        OVRPlugin.BodyState state = SyntheticState(BodyProbeWireProtocol.FullBodyJointCount);
+        OVRPlugin.BodyJointLocation joint = state.JointLocations[0];
+        joint.Pose = new OVRPlugin.Posef
+        {
+            Position = new OVRPlugin.Vector3f { x = 1f, y = 2f, z = 3f },
+            Orientation = new OVRPlugin.Quatf { x = 0.1f, y = 0.2f, z = 0.3f, w = 0.9f }
+        };
+        state.JointLocations[0] = joint;
+        var body = new BodyProbeBodyData();
+
+        BodyProbeWireProtocol.PopulateBody(
+            body,
+            state,
+            OVRPlugin.BodyJointSet.FullBody);
+
+        Assert.That(body.joints[0].position.x, Is.EqualTo(1f));
+        Assert.That(body.joints[0].position.y, Is.EqualTo(2f));
+        Assert.That(body.joints[0].position.z, Is.EqualTo(-3f));
+        Assert.That(body.joints[0].orientation.x, Is.EqualTo(-0.1f));
+        Assert.That(body.joints[0].orientation.y, Is.EqualTo(-0.2f));
+        Assert.That(body.joints[0].orientation.z, Is.EqualTo(0.3f));
+        Assert.That(body.joints[0].orientation.w, Is.EqualTo(0.9f));
     }
 
     [Test]

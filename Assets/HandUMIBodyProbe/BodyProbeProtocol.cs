@@ -249,17 +249,23 @@ public static class BodyProbeWireProtocol
         for (int i = 0; i < jointCount; ++i)
         {
             OVRPlugin.BodyJointLocation source = bodyState.JointLocations[i];
+            // OVRPlugin body poses use the native right-handed convention.
+            // Controllers/HMD returned by OVRInput are already converted to
+            // Unity's left-handed tracking space, so perform the SDK's same
+            // flipped-Z conversion before placing both channels on one wire.
+            Vector3 unityPosition = source.Pose.Position.FromFlippedZVector3f();
+            Quaternion unityOrientation = source.Pose.Orientation.FromFlippedZQuatf();
             BodyProbeJoint destination = target.joints[i];
             destination.index = i;
             destination.name = names != null ? names[i] : $"Joint_{i}";
             destination.locationFlags = unchecked((long)(ulong)source.LocationFlags);
-            destination.position.x = source.Pose.Position.x;
-            destination.position.y = source.Pose.Position.y;
-            destination.position.z = source.Pose.Position.z;
-            destination.orientation.x = source.Pose.Orientation.x;
-            destination.orientation.y = source.Pose.Orientation.y;
-            destination.orientation.z = source.Pose.Orientation.z;
-            destination.orientation.w = source.Pose.Orientation.w;
+            destination.position.x = unityPosition.x;
+            destination.position.y = unityPosition.y;
+            destination.position.z = unityPosition.z;
+            destination.orientation.x = unityOrientation.x;
+            destination.orientation.y = unityOrientation.y;
+            destination.orientation.z = unityOrientation.z;
+            destination.orientation.w = unityOrientation.w;
             target.jointNames[i] = destination.name;
             target.jointLocationFlags[i] = destination.locationFlags;
             int poseOffset = i * 7;

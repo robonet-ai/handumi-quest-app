@@ -7,7 +7,7 @@ public static class ConfigureHandUMIBodyProbeProject
 {
     public const string PackageIdentifier = "com.handumi.questapp.bodyprobe";
     public const string ProductName = "HandUMI Body Probe";
-    public const string VersionName = "0.1.1";
+    public const string VersionName = "0.1.2";
 
     static ConfigureHandUMIBodyProbeProject()
     {
@@ -26,7 +26,7 @@ public static class ConfigureHandUMIBodyProbeProject
         PlayerSettings.SetApplicationIdentifier(
             NamedBuildTarget.Android,
             PackageIdentifier);
-        PlayerSettings.Android.bundleVersionCode = 2;
+        PlayerSettings.Android.bundleVersionCode = 3;
         PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.Activity;
 
         OVRProjectConfig projectConfig = OVRProjectConfig.CachedProjectConfig;
