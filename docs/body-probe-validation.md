@@ -74,7 +74,7 @@ On the workstation:
 
 ```bash
 handumi-quest-probe capture \
-  --config configs/tracking_meta_quest.yaml \
+  --config configs/rig.yaml \
   --duration-s 60 \
   --adb-health \
   --output artifacts/quest-probe/bodyprobe-smoke
