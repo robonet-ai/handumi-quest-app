@@ -7,6 +7,11 @@ It uses package `com.handumi.questapp.bodyprobe`, scene
 controller application, but both use TCP 65432 and UDP 42000 and therefore must
 not run simultaneously.
 
+Version 0.1.1 runs as a mixed-reality application: Meta passthrough is a
+required capability, an `OVRPassthroughLayer` underlay supplies the real-world
+view, and the eye cameras clear to transparent black. The diagnostic status
+canvas remains visible over passthrough.
+
 ## Build and static verification
 
 ```bash

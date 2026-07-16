@@ -46,14 +46,19 @@ public static class HandUMIBodyProbeBuild
         manager.trackingOriginType = OVRManager.TrackingOrigin.Stage;
         manager.SimultaneousHandsAndControllersEnabled = false;
         manager.launchSimultaneousHandsControllersOnStartup = false;
+        manager.isInsightPassthroughEnabled = true;
 
         GameObject rigObject = new GameObject("OVRCameraRig");
         OVRCameraRig rig = rigObject.AddComponent<OVRCameraRig>();
         rig.EnsureGameObjectIntegrity();
+        OVRPassthroughLayer passthrough =
+            rigObject.AddComponent<OVRPassthroughLayer>();
+        passthrough.overlayType = OVROverlay.OverlayType.Underlay;
+        passthrough.hidden = false;
         foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
         {
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = BodyProbeStatusDisplay.BackgroundColor;
+            camera.backgroundColor = Color.clear;
             camera.nearClipPlane = QuestStatusDisplay.NearClipMeters;
         }
 

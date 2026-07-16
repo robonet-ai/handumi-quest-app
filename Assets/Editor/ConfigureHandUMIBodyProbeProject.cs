@@ -7,7 +7,7 @@ public static class ConfigureHandUMIBodyProbeProject
 {
     public const string PackageIdentifier = "com.handumi.questapp.bodyprobe";
     public const string ProductName = "HandUMI Body Probe";
-    public const string VersionName = "0.1.0";
+    public const string VersionName = "0.1.1";
 
     static ConfigureHandUMIBodyProbeProject()
     {
@@ -26,7 +26,7 @@ public static class ConfigureHandUMIBodyProbeProject
         PlayerSettings.SetApplicationIdentifier(
             NamedBuildTarget.Android,
             PackageIdentifier);
-        PlayerSettings.Android.bundleVersionCode = 1;
+        PlayerSettings.Android.bundleVersionCode = 2;
         PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.Activity;
 
         OVRProjectConfig projectConfig = OVRProjectConfig.CachedProjectConfig;
@@ -39,6 +39,8 @@ public static class ConfigureHandUMIBodyProbeProject
             OVRProjectConfig.RenderModelSupport.Disabled;
         projectConfig.bodyTrackingSupport =
             OVRProjectConfig.FeatureSupport.Supported;
+        projectConfig.insightPassthroughSupport =
+            OVRProjectConfig.FeatureSupport.Required;
         OVRProjectConfig.CommitProjectConfig(projectConfig);
 
         OVRRuntimeSettings runtimeSettings = OVRRuntimeSettings.GetRuntimeSettings();

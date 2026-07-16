@@ -137,6 +137,8 @@ public sealed class BodyProbeEditModeTests
             Is.EqualTo("HandUMI Body Probe"));
         Assert.That(OVRProjectConfig.CachedProjectConfig.bodyTrackingSupport,
             Is.EqualTo(OVRProjectConfig.FeatureSupport.Supported));
+        Assert.That(OVRProjectConfig.CachedProjectConfig.insightPassthroughSupport,
+            Is.EqualTo(OVRProjectConfig.FeatureSupport.Required));
         Assert.That(OVRProjectConfig.CachedProjectConfig.handTrackingSupport,
             Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersOnly));
         Assert.That(OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet,
@@ -161,6 +163,11 @@ public sealed class BodyProbeEditModeTests
         GameObject[] roots = scene.GetRootGameObjects();
         OVRManager manager = roots.Select(root => root.GetComponent<OVRManager>())
             .FirstOrDefault(value => value != null);
+        OVRCameraRig rig = roots.Select(root => root.GetComponent<OVRCameraRig>())
+            .FirstOrDefault(value => value != null);
+        OVRPassthroughLayer passthrough = roots
+            .SelectMany(root => root.GetComponentsInChildren<OVRPassthroughLayer>(true))
+            .FirstOrDefault();
         OVRBody body = roots.SelectMany(root => root.GetComponentsInChildren<OVRBody>(true))
             .FirstOrDefault();
         BodyProbeSender sender = roots
@@ -171,9 +178,21 @@ public sealed class BodyProbeEditModeTests
             .FirstOrDefault();
 
         Assert.That(manager, Is.Not.Null);
+        Assert.That(rig, Is.Not.Null);
         Assert.That(manager.trackingOriginType, Is.EqualTo(OVRManager.TrackingOrigin.Stage));
+        Assert.That(manager.isInsightPassthroughEnabled, Is.True);
         Assert.That(manager.SimultaneousHandsAndControllersEnabled, Is.False);
         Assert.That(manager.launchSimultaneousHandsControllersOnStartup, Is.False);
+        Assert.That(passthrough, Is.Not.Null);
+        Assert.That(passthrough.overlayType,
+            Is.EqualTo(OVROverlay.OverlayType.Underlay));
+        Assert.That(passthrough.hidden, Is.False);
+        Camera[] cameras = rig.GetComponentsInChildren<Camera>(true);
+        Assert.That(cameras, Is.Not.Empty);
+        Assert.That(cameras.All(camera =>
+            camera.clearFlags == CameraClearFlags.SolidColor), Is.True);
+        Assert.That(cameras.All(camera =>
+            Mathf.Approximately(camera.backgroundColor.a, 0f)), Is.True);
         Assert.That(body, Is.Not.Null);
         Assert.That(body.ProvidedSkeletonType, Is.EqualTo(OVRPlugin.BodyJointSet.FullBody));
         Assert.That(sender, Is.Not.Null);
