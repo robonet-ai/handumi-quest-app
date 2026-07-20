@@ -1,5 +1,8 @@
 # HandUMI Body Probe validation
 
+> Research preview: passing this runbook establishes diagnostic operation, not
+> anatomical accuracy, synchronization-grade timing, or production safety.
+
 `HandUMI Body Probe` is an isolated Quest diagnostic application for INV-001.
 It uses package `com.handumi.questapp.bodyprobe`, scene
 `Assets/HandUMIBodyProbe/Scenes/HandUMIBodyProbe.unity`, and APK
@@ -7,7 +10,7 @@ It uses package `com.handumi.questapp.bodyprobe`, scene
 controller application, but both use TCP 65432 and UDP 42000 and therefore must
 not run simultaneously.
 
-Version 0.1.1 runs as a mixed-reality application: Meta passthrough is a
+Version 0.1.2 runs as a mixed-reality application: Meta passthrough is a
 required capability, an `OVRPassthroughLayer` underlay supplies the real-world
 view, and the eye cameras clear to transparent black. The diagnostic status
 canvas remains visible over passthrough.
@@ -92,3 +95,8 @@ companion tasktree. A human must wear the headset and perform the safe scripted
 motions; S3 additionally requires the documented HandUMI controller mounting.
 Quest Link L1 requires a supported Windows Meta Quest Link host or an explicit
 decision that Link is outside the deployment scope.
+
+Do not publish raw captures containing participant motion, passthrough/room
+context, device identifiers, signing material, or private network addresses.
+Retain redacted manifests, aggregate timing statistics, and APK/source hashes
+as release evidence.
