@@ -109,11 +109,11 @@ public sealed class HandUMIWireProtocolTests
     public void StatusTextShowsTheAppVersionAndEndpointForConnectedClients()
     {
         Assert.That(
-            QuestStatusDisplay.FormatStatus(false, "192.168.1.20", 65432),
+            QuestStatusDisplay.FormatStatus(false, "192.0.2.2", 65432),
             Is.EqualTo("HandUMI Quest App (v0.2.1)"));
         Assert.That(
-            QuestStatusDisplay.FormatStatus(true, "192.168.1.20", 65432),
-            Is.EqualTo("HandUMI Quest App (v0.2.1)\nConnected • IP: 192.168.1.20:65432"));
+            QuestStatusDisplay.FormatStatus(true, "192.0.2.2", 65432),
+            Is.EqualTo("HandUMI Quest App (v0.2.1)\nConnected • IP: 192.0.2.2:65432"));
     }
 
     [Test]
