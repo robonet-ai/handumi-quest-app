@@ -45,6 +45,28 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def find_apksigner() -> Path | None:
+    executable = shutil.which("apksigner")
+    if executable:
+        return Path(executable)
+    roots = [
+        Path(value)
+        for value in (
+            os.environ.get("ANDROID_SDK_ROOT"),
+            os.environ.get("ANDROID_HOME"),
+        )
+        if value
+    ]
+    roots.append(Path.home() / "Android/Sdk")
+    candidates = [
+        candidate
+        for root in roots
+        for candidate in (root / "build-tools").glob("*/apksigner")
+        if candidate.is_file()
+    ]
+    return sorted(candidates)[-1] if candidates else None
+
+
 def project_version(project: Path) -> str:
     version_file = project / "ProjectSettings" / "ProjectVersion.txt"
     for line in version_file.read_text(encoding="utf-8").splitlines():
@@ -190,19 +212,26 @@ def run_build(
     if manifest_data.get("artifactSha256") != sha256(artifact):
         raise RuntimeError(f"{profile_name} build manifest checksum mismatch")
     signature = "not inspected (apksigner unavailable)"
-    apksigner = shutil.which("apksigner")
+    certificate_sha256 = None
+    apksigner = find_apksigner()
     if apksigner:
         verified = subprocess.run(
-            [apksigner, "verify", "--print-certs", str(artifact)],
+            [str(apksigner), "verify", "--print-certs", str(artifact)],
             check=False,
             capture_output=True,
             text=True,
         )
-        signature = (
-            verified.stdout.strip()
-            if verified.returncode == 0
-            else "unsigned or signature verification failed"
-        )
+        if verified.returncode != 0:
+            signature = "unsigned or signature verification failed"
+        elif "CN=Android Debug" in verified.stdout:
+            signature = "Android debug-signed; not release-signed"
+        else:
+            signature = "signed; signer is not the Android debug certificate"
+        marker = "Signer #1 certificate SHA-256 digest:"
+        for line in verified.stdout.splitlines():
+            if line.startswith(marker):
+                certificate_sha256 = line.split(":", 1)[1].strip()
+                break
     return {
         "profile": profile_name,
         "package_identifier": profile["package"],
@@ -210,6 +239,7 @@ def run_build(
         "size_bytes": artifact.stat().st_size,
         "sha256": sha256(artifact),
         "signature_status": signature,
+        "signature_certificate_sha256": certificate_sha256,
         "manifest": manifest.name,
         "checksum_file": checksum.name,
     }
