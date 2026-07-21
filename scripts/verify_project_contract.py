@@ -33,6 +33,13 @@ def require_text(path: str, patterns: dict[str, str]) -> None:
             raise RuntimeError(f"{path} is missing {label}: {pattern}")
 
 
+def forbid_text(path: str, patterns: dict[str, str]) -> None:
+    text = (ROOT / path).read_text(encoding="utf-8")
+    for label, pattern in patterns.items():
+        if re.search(pattern, text, re.MULTILINE) is not None:
+            raise RuntimeError(f"{path} contains forbidden {label}: {pattern}")
+
+
 def main() -> None:
     project = (ROOT / "ProjectSettings/ProjectVersion.txt").read_text()
     if "m_EditorVersion: 6000.0.76f1" not in project:
@@ -64,6 +71,14 @@ def main() -> None:
             "body package": r'PackageIdentifier\s*=\s*"com\.handumi\.questapp\.bodyprobe"',
             "body version": r'VersionName\s*=\s*"0\.1\.2"',
             "full body": r"BodyTrackingJointSet\s*=\s*OVRPlugin\.BodyJointSet\.FullBody",
+        },
+    )
+    forbid_text(
+        "Assets/Editor/HandUMICompatibilityBuild.cs",
+        {
+            "local Android SDK path in artifact manifest": r"public string androidSdk",
+            "local Android NDK path in artifact manifest": r"public string androidNdk",
+            "local JDK path in artifact manifest": r"public string jdk",
         },
     )
     require_text(
