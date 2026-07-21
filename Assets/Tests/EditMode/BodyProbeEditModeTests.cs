@@ -11,6 +11,32 @@ using UnityEngine.SceneManagement;
 
 public sealed class BodyProbeEditModeTests
 {
+    [Test]
+    public void PermissionControllerDisablesBodyWhilePausedAndRestoresInEditor()
+    {
+        GameObject owner = new GameObject("permission lifecycle test");
+        try
+        {
+            OVRBody body = owner.AddComponent<OVRBody>();
+            BodyProbePermissionController controller =
+                owner.AddComponent<BodyProbePermissionController>();
+            controller.Configure(body);
+            InvokePrivate(controller, "Awake", null);
+            InvokePrivate(controller, "Start", null);
+            Assert.That(controller.PermissionState, Is.EqualTo("EditorGranted"));
+            Assert.That(body.enabled, Is.True);
+
+            InvokePrivate(controller, "OnApplicationPause", true);
+            Assert.That(body.enabled, Is.False);
+            InvokePrivate(controller, "OnApplicationPause", false);
+            Assert.That(body.enabled, Is.True);
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(owner);
+        }
+    }
+
     [TestCase(BodyProbeWireProtocol.UpperBodyJointCount, "UpperBody")]
     [TestCase(BodyProbeWireProtocol.FullBodyJointCount, "FullBody")]
     public void SerializesEveryBodyJointWithoutChangingFlags(
@@ -48,6 +74,21 @@ public sealed class BodyProbeEditModeTests
         Assert.That(json, Does.Contain(expectedJointSet == "FullBody"
             ? "FullBody_RightFootBall"
             : "Body_RightHandLittleTip"));
+    }
+
+    private static void InvokePrivate(
+        object target,
+        string methodName,
+        object argument)
+    {
+        System.Reflection.MethodInfo method = target.GetType().GetMethod(
+            methodName,
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null, $"Missing private method {methodName}");
+        method.Invoke(
+            target,
+            argument == null ? null : new[] { argument });
     }
 
     [Test]

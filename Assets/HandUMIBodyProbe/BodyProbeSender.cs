@@ -42,6 +42,9 @@ public sealed class BodyProbeSender : MonoBehaviour
     private long lastSkeletonRevision = long.MinValue;
     private bool lastBodyActive;
     private bool hasBodyObservation;
+    private bool componentStarted;
+    private bool applicationPaused;
+    private bool applicationFocused = true;
 
     public string LocalIpAddress => localIpAddress;
     public int ServerPort => serverPort;
@@ -80,7 +83,28 @@ public sealed class BodyProbeSender : MonoBehaviour
         sessionId = Guid.NewGuid().ToString("N");
         LoadBuildInfo();
         installedApkSha256 = ComputeInstalledApkSha256();
-        StartServer();
+        componentStarted = true;
+        ApplyLifecycleState();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        applicationPaused = paused;
+        ApplyLifecycleState();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        applicationFocused = focused;
+        ApplyLifecycleState();
+    }
+
+    private void ApplyLifecycleState()
+    {
+        if (componentStarted && !applicationPaused && applicationFocused)
+            StartServer();
+        else
+            StopServer();
     }
 
     private void Update()
@@ -325,7 +349,11 @@ public sealed class BodyProbeSender : MonoBehaviour
         }
     }
 
-    private void OnDestroy() => StopServer();
+    private void OnDestroy()
+    {
+        componentStarted = false;
+        StopServer();
+    }
     private void OnApplicationQuit() => StopServer();
 
     private void StopServer()

@@ -109,6 +109,66 @@ public sealed class TransportLifecycleTests
     }
 
     [UnityTest]
+    public IEnumerator PoseServerStopsOnPauseAndRestartsOnceOnResumeAndFocus()
+    {
+        int port = FreeTcpPort();
+        GameObject owner = new GameObject("PoseSender lifecycle owner");
+        PoseSender sender = owner.AddComponent<PoseSender>();
+        SetPrivateField(sender, "serverPort", port);
+        LogAssert.Expect(
+            LogType.Error,
+            "[PoseSender] OVRCameraRig/centerEyeAnchor is not wired; pose frames are disabled.");
+        yield return null;
+
+        InvokePrivate(sender, "OnApplicationPause", true);
+        yield return null;
+        var duringPause = new TcpListener(IPAddress.Loopback, port);
+        Assert.DoesNotThrow(duringPause.Start);
+        duringPause.Stop();
+
+        InvokePrivate(sender, "OnApplicationPause", false);
+        InvokePrivate(sender, "OnApplicationFocus", true);
+        InvokePrivate(sender, "OnApplicationFocus", true);
+        yield return null;
+        using (var client = new TcpClient())
+        {
+            client.Connect(IPAddress.Loopback, port);
+            yield return WaitForClientCount(sender, 1);
+        }
+
+        UnityEngine.Object.Destroy(owner);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator BodyProbeStopsInBackgroundAndRecoversAfterForeground()
+    {
+        int port = FreeTcpPort();
+        GameObject owner = new GameObject("BodyProbeSender lifecycle owner");
+        BodyProbeSender sender = owner.AddComponent<BodyProbeSender>();
+        SetPrivateField(sender, "serverPort", port);
+        yield return null;
+
+        InvokePrivate(sender, "OnApplicationFocus", false);
+        yield return null;
+        var backgroundListener = new TcpListener(IPAddress.Loopback, port);
+        Assert.DoesNotThrow(backgroundListener.Start);
+        backgroundListener.Stop();
+
+        InvokePrivate(sender, "OnApplicationFocus", true);
+        InvokePrivate(sender, "OnApplicationPause", false);
+        yield return null;
+        using (var client = new TcpClient())
+        {
+            client.Connect(IPAddress.Loopback, port);
+            yield return WaitForClientCount(sender, 1);
+        }
+
+        UnityEngine.Object.Destroy(owner);
+        yield return null;
+    }
+
+    [UnityTest]
     public IEnumerator TimeSyncIgnoresMalformedPacketRespondsAndReleasesPort()
     {
         int port = FreeUdpPort();
@@ -162,6 +222,15 @@ public sealed class TransportLifecycleTests
             BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.That(field, Is.Not.Null, $"Missing private field {fieldName}");
         field.SetValue(target, value);
+    }
+
+    private static void InvokePrivate<T>(T target, string methodName, object argument)
+    {
+        MethodInfo method = typeof(T).GetMethod(
+            methodName,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null, $"Missing private method {methodName}");
+        method.Invoke(target, new[] { argument });
     }
 
     private static IEnumerator WaitForClientCount(PoseSender sender, int expected)

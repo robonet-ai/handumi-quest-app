@@ -14,6 +14,7 @@ public sealed class BodyProbePermissionController : MonoBehaviour
 
     [SerializeField] private OVRBody body;
     [SerializeField] private string permissionState = "NotRequested";
+    private bool applicationPaused;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
     private PermissionCallbacks callbacks;
@@ -38,6 +39,29 @@ public sealed class BodyProbePermissionController : MonoBehaviour
 
     private void Start()
     {
+        EnsurePermission();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        applicationPaused = paused;
+        if (paused)
+        {
+            if (body != null)
+                body.enabled = false;
+            return;
+        }
+        EnsurePermission();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        if (focused && !applicationPaused)
+            EnsurePermission();
+    }
+
+    private void EnsurePermission()
+    {
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (Permission.HasUserAuthorizedPermission(PermissionId))
         {
@@ -45,6 +69,8 @@ public sealed class BodyProbePermissionController : MonoBehaviour
             return;
         }
 
+        if (permissionState == "Requested")
+            return;
         permissionState = "Requested";
         callbacks = new PermissionCallbacks();
         callbacks.PermissionGranted += _ => SetGranted();
@@ -61,7 +87,7 @@ public sealed class BodyProbePermissionController : MonoBehaviour
     private void SetGranted()
     {
         permissionState = "Granted";
-        if (body != null)
+        if (body != null && !applicationPaused)
             body.enabled = true;
     }
 
