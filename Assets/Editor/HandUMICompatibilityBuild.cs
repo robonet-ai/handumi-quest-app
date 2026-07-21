@@ -370,9 +370,6 @@ public static class HandUMICompatibilityBuild
                 "com.UnityTechnologies.com.unity.template.urpblank",
             builtAtUtc = DateTime.UtcNow.ToString("O"),
             unityVersion = Application.unityVersion,
-            androidSdk = ConfigureAndroidTools.ResolvedSdkPath,
-            androidNdk = ConfigureAndroidTools.ResolvedNdkPath,
-            jdk = ConfigureAndroidTools.ResolvedJdkPath,
             productName = PlayerSettings.productName,
             packageIdentifier = PlayerSettings.GetApplicationIdentifier(
                 NamedBuildTarget.Android),
@@ -457,9 +454,6 @@ public static class HandUMICompatibilityBuild
         public string originalPackageIdentifier;
         public string builtAtUtc;
         public string unityVersion;
-        public string androidSdk;
-        public string androidNdk;
-        public string jdk;
         public string productName;
         public string packageIdentifier;
         public string versionName;

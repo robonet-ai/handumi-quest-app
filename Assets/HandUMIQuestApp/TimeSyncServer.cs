@@ -15,9 +15,23 @@ public sealed class TimeSyncServer : MonoBehaviour
     [SerializeField] private int syncPort = HandUMIWireProtocol.TimeSyncPort;
 
     private UdpClient sock;
+    private bool componentStarted;
+    private bool applicationPaused;
+    private bool applicationFocused = true;
 
     private void Start()
     {
+        componentStarted = true;
+        ApplyLifecycleState();
+    }
+
+    private void ApplyLifecycleState()
+    {
+        if (!componentStarted || applicationPaused || !applicationFocused)
+        {
+            StopServer();
+            return;
+        }
         if (sock != null)
             return;
 
@@ -27,6 +41,30 @@ public sealed class TimeSyncServer : MonoBehaviour
     }
 
     private void OnDestroy()
+    {
+        componentStarted = false;
+        StopServer();
+    }
+
+    private void OnApplicationQuit()
+    {
+        componentStarted = false;
+        StopServer();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        applicationPaused = paused;
+        ApplyLifecycleState();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        applicationFocused = focused;
+        ApplyLifecycleState();
+    }
+
+    private void StopServer()
     {
         UdpClient socket = sock;
         sock = null;

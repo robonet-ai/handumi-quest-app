@@ -2,7 +2,8 @@
   "name": "HandUMIQuestApp.PlayModeTests",
   "rootNamespace": "",
   "references": [
-    "HandUMIQuestApp.Runtime"
+    "HandUMIQuestApp.Runtime",
+    "HandUMIBodyProbe.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

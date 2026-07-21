@@ -1,0 +1,43 @@
+name: Unity self-hosted release gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_android:
+        description: Build both Android package identities
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-gate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unity-gate:
+    runs-on: [self-hosted, linux, unity-6000.0.76f1, android]
+    timeout-minutes: 90
+    steps:
+      - name: Check out immutable requested revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run EditMode, PlayMode, and optional Android gates
+        env:
+          HANDUMI_UNITY_EDITOR: ${{ vars.HANDUMI_UNITY_EDITOR }}
+        run: |
+          android=none
+          if [[ "${{ inputs.build_android }}" == "true" ]]; then android=both; fi
+          python3 scripts/run_unity_gate.py \
+            --output-dir "$RUNNER_TEMP/handumi-unity-gate" \
+            --android "$android"
+
+      - name: Upload machine-readable reports, logs, and unsigned candidates
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: handumi-unity-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/handumi-unity-gate
+          if-no-files-found: error
+          retention-days: 30

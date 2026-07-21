@@ -24,7 +24,11 @@ internal static class ConfigureHandUMIQuestProject
 
     static ConfigureHandUMIQuestProject()
     {
-        EditorApplication.delayCall += Apply;
+        // The body probe is an isolated build profile with its own identity and
+        // Meta feature settings. Never let the compatibility initializer rewrite
+        // that profile merely because both applications share this foundation.
+        if (!File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+            EditorApplication.delayCall += Apply;
     }
 
     [MenuItem("Tools/HandUMI Quest/Apply Recovered Android Settings")]

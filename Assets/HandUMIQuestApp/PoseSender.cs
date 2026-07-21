@@ -15,7 +15,7 @@ using TMPro;
 using UnityEngine;
 
 [Serializable]
-public sealed class PoseData
+public class PoseData
 {
     public Vector3 hmdPosition;
     public Quaternion hmdRotation;
@@ -108,6 +108,9 @@ public sealed class PoseSender : MonoBehaviour
     private Thread listenThread;
     private volatile bool isRunning;
     private bool loggedMissingRig;
+    private bool componentStarted;
+    private bool applicationPaused;
+    private bool applicationFocused = true;
     private string localIpAddress = IPAddress.Loopback.ToString();
     private float nextIpRefreshTime;
 
@@ -127,7 +130,28 @@ public sealed class PoseSender : MonoBehaviour
 
     private void Start()
     {
-        StartServer();
+        componentStarted = true;
+        ApplyLifecycleState();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        applicationPaused = paused;
+        ApplyLifecycleState();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        applicationFocused = focused;
+        ApplyLifecycleState();
+    }
+
+    private void ApplyLifecycleState()
+    {
+        if (componentStarted && !applicationPaused && applicationFocused)
+            StartServer();
+        else
+            StopServer();
     }
 
     private void StartServer()
@@ -304,6 +328,7 @@ public sealed class PoseSender : MonoBehaviour
         // Scenes can be reloaded in the Editor and at runtime. The recovered
         // APK only exposed OnApplicationQuit, but releasing the listener here
         // prevents a reconstructed scene reload from leaving port 65432 bound.
+        componentStarted = false;
         StopServer();
     }
 

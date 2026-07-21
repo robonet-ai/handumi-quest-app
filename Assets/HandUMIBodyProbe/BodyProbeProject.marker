@@ -1,0 +1,2 @@
+This marker prevents the controller-only compatibility initializer from
+rewriting the isolated HandUMI Body Probe build profile.

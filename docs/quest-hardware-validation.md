@@ -54,8 +54,9 @@ standalone probe or HandUMI receiver:
 
 ```bash
 adb shell ip route
-# Replace QUEST_IP with the `src` address reported above, for example:
-python standalone_probe.py 10.104.18.172
+# Replace the TEST-NET address with the `src` address reported above.
+QUEST_IP=192.0.2.2
+python standalone_probe.py "$QUEST_IP"
 ```
 
 Capture at least five minutes of raw output and logs. Exercise both controllers,

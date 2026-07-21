@@ -109,11 +109,11 @@ public sealed class HandUMIWireProtocolTests
     public void StatusTextShowsTheAppVersionAndEndpointForConnectedClients()
     {
         Assert.That(
-            QuestStatusDisplay.FormatStatus(false, "192.168.1.20", 65432),
+            QuestStatusDisplay.FormatStatus(false, "192.0.2.2", 65432),
             Is.EqualTo("HandUMI Quest App (v0.2.1)"));
         Assert.That(
-            QuestStatusDisplay.FormatStatus(true, "192.168.1.20", 65432),
-            Is.EqualTo("HandUMI Quest App (v0.2.1)\nConnected • IP: 192.168.1.20:65432"));
+            QuestStatusDisplay.FormatStatus(true, "192.0.2.2", 65432),
+            Is.EqualTo("HandUMI Quest App (v0.2.1)\nConnected • IP: 192.0.2.2:65432"));
     }
 
     [Test]
@@ -121,6 +121,14 @@ public sealed class HandUMIWireProtocolTests
     {
         OVRProjectConfig config = OVRProjectConfig.CachedProjectConfig;
         Assert.That(config, Is.Not.Null);
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(config.handTrackingSupport,
+                Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersOnly));
+            Assert.That(config.bodyTrackingSupport,
+                Is.EqualTo(OVRProjectConfig.FeatureSupport.Supported));
+            return;
+        }
         Assert.That(config.handTrackingSupport,
             Is.EqualTo(OVRProjectConfig.HandTrackingSupport.ControllersAndHands));
         Assert.That(config.renderModelSupport,
@@ -130,6 +138,17 @@ public sealed class HandUMIWireProtocolTests
     [Test]
     public void AndroidIdentitySupportsSideBySideInstall()
     {
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
+                Is.EqualTo("com.handumi.questapp.bodyprobe"));
+            Assert.That(PlayerSettings.productName, Is.EqualTo("HandUMI Body Probe"));
+            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.1.2"));
+            Assert.That(PlayerSettings.Android.bundleVersionCode, Is.EqualTo(3));
+            Assert.That(PlayerSettings.Android.applicationEntry,
+                Is.EqualTo(AndroidApplicationEntry.Activity));
+            return;
+        }
         Assert.That(PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),
             Is.EqualTo("com.handumi.questapp"));
         Assert.That(PlayerSettings.productName,
@@ -161,6 +180,12 @@ public sealed class HandUMIWireProtocolTests
     {
         const string scenePath =
             "Assets/HandUMIQuestApp/Scenes/HandUMIQuestCompatibility.unity";
+        if (File.Exists("Assets/HandUMIBodyProbe/BodyProbeProject.marker"))
+        {
+            Assert.That(File.Exists(scenePath), Is.True,
+                "The isolated body branch must retain the rollback scene source.");
+            return;
+        }
         EditorBuildSettingsScene[] buildScenes = EditorBuildSettings.scenes;
         Assert.That(buildScenes, Has.Length.EqualTo(1));
         Assert.That(buildScenes[0].enabled, Is.True);
