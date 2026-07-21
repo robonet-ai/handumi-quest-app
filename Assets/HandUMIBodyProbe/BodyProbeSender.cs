@@ -119,16 +119,21 @@ public sealed class BodyProbeSender : MonoBehaviour
         }
 
         PruneDisconnectedClients();
-        if (!HasConnectedClient)
-            return;
-
-        BodyProbeLegacySampler.Populate(packet, ovrCameraRig);
+        // Keep the in-headset diagnostic current even before a workstation
+        // connects. Previously the status canvas showed the packet defaults
+        // (inactive / no active joint set / zero joints) until the first TCP
+        // client, which looked like a permission or runtime failure.
         OVRPlugin.BodyJointSet requestedJointSet =
             OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet;
         OVRPlugin.BodyState? state = body != null && body.enabled
             ? body.BodyState
             : null;
         BodyProbeWireProtocol.PopulateBody(packet.body, state, requestedJointSet);
+
+        if (!HasConnectedClient)
+            return;
+
+        BodyProbeLegacySampler.Populate(packet, ovrCameraRig);
         bool isNewBodyObservation = !hasBodyObservation ||
                                     packet.body.active != lastBodyActive ||
                                     packet.body.sourceTimeNs != lastBodySourceTimeNs ||

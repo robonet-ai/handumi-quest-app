@@ -40,6 +40,14 @@ def forbid_text(path: str, patterns: dict[str, str]) -> None:
             raise RuntimeError(f"{path} contains forbidden {label}: {pattern}")
 
 
+def require_order(path: str, before: str, after: str, label: str) -> None:
+    text = (ROOT / path).read_text(encoding="utf-8")
+    before_index = text.find(before)
+    after_index = text.find(after)
+    if before_index < 0 or after_index < 0 or before_index >= after_index:
+        raise RuntimeError(f"{path} violates {label}")
+
+
 def main() -> None:
     project = (ROOT / "ProjectSettings/ProjectVersion.txt").read_text()
     if "m_EditorVersion: 6000.0.76f1" not in project:
@@ -87,6 +95,12 @@ def main() -> None:
             "TCP port": r"PosePort\s*=\s*65432",
             "UDP port": r"TimeSyncPort\s*=\s*42000",
         },
+    )
+    require_order(
+        "Assets/HandUMIBodyProbe/BodyProbeSender.cs",
+        "BodyProbeWireProtocol.PopulateBody(packet.body, state, requestedJointSet);",
+        "if (!HasConnectedClient)",
+        "disconnected in-headset body status sampling",
     )
     require_text(
         "Assets/Plugins/Android/AndroidManifest.xml",
