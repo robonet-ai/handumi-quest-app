@@ -128,6 +128,11 @@ def unity_command(unity: Path, project: Path, log: Path) -> list[str]:
         "-nographics",
         "-projectPath",
         str(project),
+        # Meta XR 74's editor assembly references an Android-scoped local in
+        # common inspector code; a pristine Linux project must enter Android
+        # before its first script compilation.
+        "-buildTarget",
+        "Android",
         "-logFile",
         str(log),
     ]
@@ -167,8 +172,6 @@ def run_build(
         log = output / f"android-{profile_name}-{phase}.log"
         command = unity_command(unity, project, log) + [
             "-quit",
-            "-buildTarget",
-            "Android",
             "-executeMethod",
             str(profile[phase]),
         ]

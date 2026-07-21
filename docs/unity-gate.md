@@ -31,7 +31,9 @@ python3 scripts/run_unity_gate.py \
   --output-dir /tmp/handumi-unity-gate --android both
 ```
 
-The script validates the editor revision before opening the project. It runs
+The script validates the editor revision before opening the project and enters
+the Android target before the first compilation (required by the pinned Meta
+XR 74 editor assembly on Linux). It runs
 the `HandUMIQuestApp.EditModeTests` and `HandUMIQuestApp.PlayModeTests`
 assemblies in batch mode, requires nonempty XML reports, and fails for a Unity
 nonzero exit, compilation error, absent report, absent expected assembly, zero
